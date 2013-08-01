@@ -5,7 +5,7 @@
 #include <assert.h>
 #include <netinet/in.h>
 #include <stdint.h>
-#include <mad.h>
+#include "mad.h"
 
 #define mad_f_tofloat(x)  ((float)  \
          ((x) / (float) (1L << MAD_F_FRACBITS)))
