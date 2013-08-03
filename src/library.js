@@ -5,7 +5,7 @@ mergeInto(LibraryManager.library, {
   _mad_js_read: function (mf, buf, position, len, rem) {
     var file = Mad.getDecoder(mf)._file;
 
-    if (position+len>file.size) {
+    if (position>=file.size) {
       return Mad.getDecoder(mf)._decode_callback("End of File");
     }
 
