@@ -135,6 +135,12 @@ var createMadDecoder = function (file, callback) {
  reader.readAsArrayBuffer(file.slice(0, 10));
 };
 
-return createMadDecoder;
+if (typeof window != "undefined") {
+  window.File.prototype.createMadDecoder = function (callback) {
+    createMadDecoder.call(window, this, callback);
+  };
+} else {
+  self.createMadDecoder = createMadDecoder;
+}
 
 }).call(context)})();

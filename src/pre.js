@@ -1,7 +1,7 @@
-// libmad.js - port of libmp3lame to JavaScript using emscripten
+// libmad.js - port of libmad to JavaScript using emscripten
 // by Romain Beauxis <toots@rastageeks.org>
 
-createMadDecoder = (function() {
+(function() {
   var Module;
   var context = {};
   return (function() {

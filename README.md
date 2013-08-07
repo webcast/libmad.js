@@ -7,7 +7,9 @@ Decoding API
 ------------
 
 ```
-createMadDecoder(file, function (decoder) {
+var file = // Request a File object..
+
+file.createMadDecoder(function (decoder) {
   decoder.decodeFrame(function (data, err) {
     if (err) {
       return decoder.close();

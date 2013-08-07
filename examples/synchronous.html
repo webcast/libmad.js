@@ -11,7 +11,7 @@
     var format;
   
     var createDecoder = function() {
-      createMadDecoder(file, function (dec) {
+      file.createMadDecoder(function (dec) {
         mad = dec;
       });
     };
