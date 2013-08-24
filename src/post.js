@@ -9,15 +9,12 @@ var decoders = {};
 
 Mad = function (opts) {
  this._file = opts.file;
- this._mad = _mad_js_init();
  this._processing = false;
  this._pending = [];
  this._channels = _malloc(int8Len);
  this._samples = _malloc(int16Len);
  this._samplerate = _malloc(int16Len);
  this._bitrate = _malloc(int16Len);
-
- decoders[this._mad] = this;
 
  return this;
 };
@@ -27,10 +24,6 @@ Mad.getDecoder = function (ptr) {
 };
 
 Mad.prototype.getCurrentFormat = function () {
-  if (!this._mad) {
-    throw "closed";
-  }
-
   return {
     channels: getValue(this._channels, "i8"),
     sampleRate: getValue(this._samplerate, "i32"),
@@ -40,10 +33,8 @@ Mad.prototype.getCurrentFormat = function () {
 
 Mad.prototype.close = function () {
   if (!this._mad) {
-    return;
+    _mad_js_close(this._mad);
   }
-
-  _mad_js_close(this._mad);
   _free(this._channels);
   _free(this._samples);
   _free(this._samplerate);
@@ -56,10 +47,6 @@ Mad.prototype.close = function () {
 };
 
 Mad.prototype.decodeFrame = function(callback) {
-  if (!this._mad) {
-    return callback(null, "closed");
-  }
-
   var mad = this;
   var _mad = this._mad;
 
@@ -130,7 +117,21 @@ var createMadDecoder = function (file, callback) {
     }
 
     var mad = new Mad({file: file});
-    return callback(mad);
+    // Decode an initial frame
+    mad._mad = _mad_js_init();
+    decoders[mad._mad] = mad;
+    mad.decodeFrame(function (data, err) {
+      if (err) {
+        return callback(null, null, err);
+      }
+
+      // Reinitialize decoder
+      _mad_js_close(mad._mad);
+      mad._mad = _mad_js_init();
+      decoders[mad._mad] = mad;
+
+      return callback(mad, mad.getCurrentFormat(), null);
+    });
  }
  reader.readAsArrayBuffer(file.slice(0, 10));
 };

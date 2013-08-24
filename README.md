@@ -9,7 +9,17 @@ Decoding API
 ```
 var file = // Request a File object..
 
-file.createMadDecoder(function (decoder) {
+file.createMadDecoder(function (decoder, format, err) {
+  if (err) {
+    console.log("Error while opening decoder", err);
+    return
+  }
+
+  console.log("Decoder ready!";
+  console.log("Samplerate: " + format.sampleRate);
+  console.log("Channels: " + format.channels);
+  console.log("Bitrate" " + format.bitRate);
+
   decoder.decodeFrame(function (data, err) {
     if (err) {
       return decoder.close();
@@ -18,11 +28,11 @@ file.createMadDecoder(function (decoder) {
     // Format can theorically change in each frame.
     // This function returns invalid values if no frame
     // has been decoded.
-    var format = decoder.getCurrentFormat(); 
+    var currentFormat = decoder.getCurrentFormat(); 
     console.log("Got a frame!");
-    console.log("Frame samplerate: " + format.sampleRate);
-    console.log("Frame channels: " + format.channels);
-    console.log("Frame bitrate" " + format.bitRate);
+    console.log("Frame samplerate: " + currentFormat.sampleRate);
+    console.log("Frame channels: " + currentFormat.channels);
+    console.log("Frame bitrate" " + currentFormat.bitRate);
     
     console.log("Now processing data");
     // data is an array of Float32Arrays..

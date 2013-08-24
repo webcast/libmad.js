@@ -8,8 +8,9 @@ var format;
 var file;
 
 var createDecoder = function() {
-  createMadDecoder(file, function (dec) {
+  createMadDecoder(file, function (dec, f) {
     mad = dec;
+    format = f;
     decode();
   });
 };
@@ -53,10 +54,6 @@ var decode = function() {
     }
 
     var chan;
-    if (!format) {
-      format = mad.getCurrentFormat();
-    }
-
     for (chan = 0; chan < decoded.length; chan++) {
       decoded[chan] = concat(decoded[chan], data[chan]);
     }
