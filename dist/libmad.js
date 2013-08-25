@@ -1917,10 +1917,10 @@ if (typeof window != "undefined") {
       this.source = this.context.createScriptProcessor(this.bufferSize, this.format.channels, this.format.channels);
       this.source.onaudioprocess = this.processBuffer;
       this.oscillator.connect(this.source);
+      setTimeout(this.decodeBuffer, 0);
       this.source.start = function(pos) {
         var bufferDuration;
         bufferDuration = parseFloat(_this.bufferSize) / parseFloat(_this.context.sampleRate);
-        setTimeout(_this.decodeBuffer, 0);
         _this.handler = setInterval(_this.decodeBuffer, 1000 * bufferDuration);
         return _this.oscillator.start(pos);
       };

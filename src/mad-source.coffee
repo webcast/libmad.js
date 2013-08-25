@@ -21,10 +21,10 @@ class MadSource
     @source.onaudioprocess = @processBuffer
     @oscillator.connect @source
 
+    setTimeout @decodeBuffer, 0
 
     @source.start = (pos) =>
       bufferDuration = parseFloat(@bufferSize)/parseFloat(@context.sampleRate)
-      setTimeout @decodeBuffer, 0
       @handler = setInterval @decodeBuffer, 1000*bufferDuration
       @oscillator.start pos
 
