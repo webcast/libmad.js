@@ -46,6 +46,9 @@ The library also provides a wrapper to create a source node for the [Web Audio A
 var context = new AudioContext;
 var source = context.createMadSource(1024, decoder, format);
 source.connect(context.destination);
+
+// The meaning of the argument is the same as for AudioBufferSourceNode
+source.start(0);
 ```
 
 Does it work?
