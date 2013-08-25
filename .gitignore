@@ -1,3 +1,4 @@
 libmad-*
 *.o
 .*.sw*
+src/mad-source.js

@@ -1888,3 +1888,106 @@ if (typeof window != "undefined") {
   self.createMadDecoder = createMadDecoder;
 }
 }).call(context)})();
+(function() {
+  var AudioContext, MadSource,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  MadSource = (function() {
+    MadSource.prototype.resampler = Samplerate.FASTEST;
+    function MadSource(opts) {
+      var i, _ref,
+        _this = this;
+      if (opts == null) opts = {};
+      this.processBuffer = __bind(this.processBuffer, this);
+      this.decodeBuffer = __bind(this.decodeBuffer, this);
+      this.bufferSize = opts.bufferSize;
+      this.reampler = opts.resampler || this.resampler;
+      this.decoder = opts.decoder;
+      this.format = opts.format;
+      this.context = opts.context;
+      this.remaining = [];
+      this.resamplers = [];
+      this.pending = [];
+      for (i = 0, _ref = this.format.channels - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
+        this.remaining[i] = new Float32Array;
+        this.pending[i] = new Float32Array;
+        this.resamplers[i] = new Samplerate({
+          type: this.resampler
+        });
+      }
+      this.oscillator = this.context.createOscillator();
+      this.source = this.context.createScriptProcessor(this.bufferSize, this.format.channels, this.format.channels);
+      this.source.onaudioprocess = this.processBuffer;
+      this.oscillator.connect(this.source);
+      this.source.start = function(pos) {
+        var bufferDuration;
+        bufferDuration = parseFloat(_this.bufferSize) / parseFloat(_this.context.sampleRate);
+        setTimeout(_this.decodeBuffer, 0);
+        _this.handler = setInterval(_this.decodeBuffer, 1000 * bufferDuration);
+        return _this.oscillator.start(pos);
+      };
+      this.source.stop = function(pos) {
+        _this.oscillator.stop(pos);
+        _this.oscillator.disconnect();
+        if (_this.handler != null) clearInterval(_this.handler);
+        return _this.handler = null;
+      };
+    }
+    MadSource.prototype.concat = function(a, b) {
+      var ret;
+      if (typeof b === "undefined" || b.length === 0) return a;
+      if (a.length === 0) return b;
+      ret = new Float32Array(a.length + b.length);
+      ret.set(a);
+      ret.subarray(a.length).set(b);
+      return ret;
+    };
+    MadSource.prototype.decodeBuffer = function() {
+      var fn,
+        _this = this;
+      fn = function(buffer, err) {
+        var data, i, used, _base, _ref, _ref2;
+        if (err != null) {
+          return typeof (_base = _this.source).onerror === "function" ? _base.onerror(err) : void 0;
+        }
+        for (i = 0, _ref = buffer.length - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
+          if (_this.format.sampleRate !== _this.context.sampleRate) {
+            buffer[i] = _this.concat(_this.remaining[i], buffer[i]);
+            _ref2 = _this.resamplers[i].process({
+              data: buffer[i],
+              ratio: parseFloat(_this.context.sampleRate) / parseFloat(_this.format.sampleRate)
+            }), data = _ref2.data, used = _ref2.used;
+            _this.remaining[i] = buffer[i].subarray(used);
+            buffer[i] = data;
+          }
+          _this.pending[i] = _this.concat(_this.pending[i], buffer[i]);
+        }
+        if (_this.pending[0].length >= _this.bufferSize) return;
+        return _this.decoder.decodeFrame(fn);
+      };
+      return this.decoder.decodeFrame(fn);
+    };
+    MadSource.prototype.processBuffer = function(buf) {
+      var channelData, i, samples, _ref, _results;
+      _results = [];
+      for (i = 0, _ref = this.format.channels - 1; 0 <= _ref ? i <= _ref : i >= _ref; 0 <= _ref ? i++ : i--) {
+        channelData = buf.outputBuffer.getChannelData(i);
+        samples = Math.min(this.pending[i].length, channelData.length);
+        channelData.set(this.pending[i].subarray(0, samples));
+        _results.push(this.pending[i] = this.pending[i].subarray(samples, this.pending[i].length));
+      }
+      return _results;
+    };
+    return MadSource;
+  })();
+  AudioContext = window.webkitAudioContext || window.AudioContext;
+  AudioContext.prototype.createMadSource = function(bufferSize, decoder, format, resampler) {
+    var mad;
+    mad = new MadSource({
+      bufferSize: bufferSize,
+      context: this,
+      decoder: decoder,
+      format: format
+    });
+    return mad.source;
+  };
+}).call(this);

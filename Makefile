@@ -13,8 +13,11 @@ TAR:=tar
 
 all: dist/libmad.js
 
-dist/libmad.js: $(MAD) src/wrapper.o src/pre.js src/post.js src/library.js
-	$(EMCC) $(LINKFLAGS) --pre-js src/pre.js --post-js src/post.js --js-library src/library.js $(wildcard $(MAD)/*.o) src/wrapper.o -o $@
+dist/libmad.js: $(MAD) src/mad-source.js src/wrapper.o src/pre.js src/post.js src/library.js
+	$(EMCC) $(LINKFLAGS) --pre-js src/pre.js --post-js src/post.js --post-js src/mad-source.js --js-library src/library.js $(wildcard $(MAD)/*.o) src/wrapper.o -o $@
+
+src/mad-source.js: src/mad-source.coffee
+	coffee -c src/mad-source.coffee
 
 $(MAD): $(MAD).tar.gz
 	$(TAR) xzvf $@.tar.gz && \
