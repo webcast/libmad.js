@@ -40,6 +40,14 @@ file.createMadDecoder(function (decoder, format, err) {
 });
 ```
 
+The library also provides a wrapper to create a source node for the [Web Audio API](https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html):
+
+```
+var context = new AudioContext;
+var source = context.createMadSource(1024, decoder, format);
+source.connect(context.destination);
+```
+
 Does it work?
 -------------
 
