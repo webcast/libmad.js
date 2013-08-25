@@ -1892,7 +1892,6 @@ if (typeof window != "undefined") {
   var AudioContext, MadSource,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   MadSource = (function() {
-    MadSource.prototype.resampler = Samplerate.FASTEST;
     function MadSource(opts) {
       var i, _ref,
         _this = this;
@@ -1900,7 +1899,7 @@ if (typeof window != "undefined") {
       this.processBuffer = __bind(this.processBuffer, this);
       this.decodeBuffer = __bind(this.decodeBuffer, this);
       this.bufferSize = opts.bufferSize;
-      this.reampler = opts.resampler || this.resampler;
+      this.reampler = opts.resampler || Samplerate.FASTEST;
       this.decoder = opts.decoder;
       this.format = opts.format;
       this.context = opts.context;

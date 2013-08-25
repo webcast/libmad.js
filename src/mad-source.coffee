@@ -1,9 +1,7 @@
 class MadSource
-  resampler: Samplerate.FASTEST
-
   constructor: (opts = {}) ->
     @bufferSize = opts.bufferSize
-    @reampler = opts.resampler || @resampler
+    @reampler = opts.resampler || Samplerate.FASTEST
     @decoder = opts.decoder
     @format = opts.format
     @context = opts.context

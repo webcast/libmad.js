@@ -1,0 +1,25 @@
+<script src="libmad.js"></script>
+<script src="https://rawgithub.com/webcast/libsamplerate.js/master/dist/libsamplerate.js"></script>
+<script>
+  var file;
+  var chans = 2;
+  var source;
+
+  var AudioContext = window.webkitAudioContext || window.AudioContext;
+  var audioContext = new AudioContext;
+  
+  function init() {
+    document.getElementById("play").onclick = function () {
+      file = document.getElementById("file").files[0];
+      file.createMadDecoder(function (decoder, format) {
+        source = audioContext.createMadSource(1024, decoder, format);
+        source.connect(audioContext.destination);
+        source.start(0);
+      });
+    }
+  };
+  
+  window.addEventListener("load", init, false);
+</script>
+<input type="file" id="file" accept="audio/mpeg"><br>
+<button id="play">Play</button>
