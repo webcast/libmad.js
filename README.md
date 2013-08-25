@@ -51,6 +51,9 @@ source.connect(context.destination);
 source.start(0);
 ```
 
+Please note that you will need [webcaster/libsamplerate.js](https://github.com/webcast/libsamplerate.js) for this
+to work.
+
 Does it work?
 -------------
 
