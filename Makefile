@@ -10,6 +10,7 @@ EMCONFIGURE:=emconfigure
 EMMAKE:=emmake
 MAD_URL:="ftp://ftp.mars.org/pub/mpeg/libmad-0.15.1b.tar.gz"
 TAR:=tar
+AUTORECONF:=$(shell which autoreconf)
 
 all: dist/libmad.js
 
@@ -22,6 +23,8 @@ src/mad-source.js: src/mad-source.coffee
 $(MAD): $(MAD).tar.gz
 	$(TAR) xzvf $@.tar.gz && \
 	cd $@ && \
+	touch NEWS AUTHORS ChangeLog && \
+	([ ! -x $(AUTORECONF) ] || $(AUTORECONF) --install) && \
 	$(EMCONFIGURE) ./configure --enable-fpm=no CFLAGS="$(CFLAGS)" && \
 	$(EMMAKE) make
 
